@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>NodeJS WebSocket Server</title>
+</head>
+<body>
+	<h1>The Chat</h1>
+    <textarea id="chat" rows="20" cols="50" readonly></textarea>
+    <br>
+    <input id="input" type="text" onkeypress="handleInput(this)"/>
+<script>
+let history = [];
+const ws = new WebSocket("ws://localhost:8080");
+ws.addEventListener("open", () =>{
+  console.log("Connected");
+  document.getElementById("chat").textContent += 'CONNECTED\n';
+});
+ 
+ws.addEventListener('message', function (event) {
+    console.log(event);
+    let receivedMsg = event.data;
+    document.getElementById("chat").textContent += formatMessage(event);
+});
+
+function handleInput(ele) {
+    if(event.keyCode == 13) {
+        let msg = ele.value;
+
+        if (ws.readyState !== ws.OPEN){
+            document.getElementById("chat").textContent += 'NO CONNECTION TO THE SERVER\n';
+        }
+
+        console.log(`Sending: ${msg}`);
+        ws.send(msg);
+        ele.value = '';
+    }
+}
+
+function formatMessage(event){
+    return `${event.data}\n`;
+}
+</script>
+</body>
+</html>
